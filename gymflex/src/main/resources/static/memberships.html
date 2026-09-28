@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GymFlex - Memberships</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+        }
+
+        .box {
+            background-color: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222;
+            color: white;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #222;
+            color: white;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>💳 GymFlex Memberships</h1>
+    <p>Manage Gym Memberships</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="index.html">← Back to Dashboard</a>
+
+    <div class="box">
+
+        <h2>Create Membership</h2>
+
+        <input type="number" id="memberId" placeholder="Member ID">
+        <input type="number" id="planId" placeholder="Plan ID">
+
+        <input type="date" id="startDate">
+        <input type="date" id="expiryDate">
+
+        <button onclick="addMembership()">Create Membership</button>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Membership List</h2>
+
+        <button onclick="loadMemberships()">Refresh Memberships</button>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Member ID</th>
+                <th>Plan ID</th>
+                <th>Start Date</th>
+                <th>Expiry Date</th>
+            </tr>
+            </thead>
+
+            <tbody id="membershipTable">
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+    function loadMemberships() {
+
+        fetch("/memberships")
+            .then(response => response.json())
+            .then(memberships => {
+
+                const table = document.getElementById("membershipTable");
+
+                table.innerHTML = "";
+
+                memberships.forEach(membership => {
+
+                    table.innerHTML += `
+                        <tr>
+                            <td>${membership.id}</td>
+                            <td>${membership.memberId}</td>
+                            <td>${membership.planId}</td>
+                            <td>${membership.startDate}</td>
+                            <td>${membership.expiryDate}</td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+
+
+    function addMembership() {
+
+        const membership = {
+
+            memberId: Number(document.getElementById("memberId").value),
+
+            planId: Number(document.getElementById("planId").value),
+
+            startDate: document.getElementById("startDate").value,
+
+            expiryDate: document.getElementById("expiryDate").value
+        };
+
+        fetch("/memberships", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(membership)
+
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                alert("Membership created successfully!");
+
+                document.getElementById("memberId").value = "";
+                document.getElementById("planId").value = "";
+                document.getElementById("startDate").value = "";
+                document.getElementById("expiryDate").value = "";
+
+                loadMemberships();
+            });
+    }
+
+    loadMemberships();
+
+</script>
+
+</body>
+</html>

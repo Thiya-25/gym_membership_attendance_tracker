@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GymFlex - Check-In</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+        }
+
+        .box {
+            background-color: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222;
+            color: white;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #222;
+            color: white;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>✅ GymFlex Check-In</h1>
+    <p>Record Gym Attendance</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="index.html">← Back to Dashboard</a>
+
+    <div class="box">
+
+        <h2>Member Check-In</h2>
+
+        <input type="number" id="memberId" placeholder="Enter Member ID">
+
+        <button onclick="checkIn()">Check In</button>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Attendance List</h2>
+
+        <button onclick="loadCheckIns()">Refresh Attendance</button>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Member ID</th>
+                <th>Check-In Time</th>
+            </tr>
+            </thead>
+
+            <tbody id="checkInTable">
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+    function loadCheckIns() {
+
+        fetch("/checkins")
+            .then(response => response.json())
+            .then(checkIns => {
+
+                const table = document.getElementById("checkInTable");
+
+                table.innerHTML = "";
+
+                checkIns.forEach(checkIn => {
+
+                    table.innerHTML += `
+                        <tr>
+                            <td>${checkIn.id}</td>
+                            <td>${checkIn.memberId}</td>
+                            <td>${checkIn.checkInTime}</td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+
+
+    function checkIn() {
+
+        const memberId =
+            document.getElementById("memberId").value;
+
+        fetch("/checkins?memberId=" + memberId, {
+
+            method: "POST"
+
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                alert("Check-in successful!");
+
+                document.getElementById("memberId").value = "";
+
+                loadCheckIns();
+            });
+    }
+
+    loadCheckIns();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GymFlex - Plans</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+        }
+
+        .box {
+            background-color: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222;
+            color: white;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #222;
+            color: white;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>📋 GymFlex Plans</h1>
+    <p>Manage Gym Plans</p>
+</header>
+
+<div class="container">
+
+    <a class="back" href="index.html">← Back to Dashboard</a>
+
+    <div class="box">
+
+        <h2>Add New Plan</h2>
+
+        <input type="text" id="name" placeholder="Plan Name">
+        <input type="number" id="durationMonths" placeholder="Duration (Months)">
+        <input type="number" id="price" placeholder="Price">
+
+        <button onclick="addPlan()">Add Plan</button>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Plan List</h2>
+
+        <button onclick="loadPlans()">Refresh Plans</button>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Plan Name</th>
+                <th>Duration</th>
+                <th>Price</th>
+                <th>Active</th>
+            </tr>
+            </thead>
+
+            <tbody id="planTable">
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+    function loadPlans() {
+
+        fetch("/plans")
+            .then(response => response.json())
+            .then(plans => {
+
+                const table = document.getElementById("planTable");
+
+                table.innerHTML = "";
+
+                plans.forEach(plan => {
+
+                    table.innerHTML += `
+                        <tr>
+                            <td>${plan.id}</td>
+                            <td>${plan.name}</td>
+                            <td>${plan.durationMonths} months</td>
+                            <td>₹${plan.price}</td>
+                            <td>${plan.active}</td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+
+
+    function addPlan() {
+
+        const plan = {
+            name: document.getElementById("name").value,
+            durationMonths: Number(document.getElementById("durationMonths").value),
+            price: Number(document.getElementById("price").value),
+            active: true
+        };
+
+        fetch("/plans", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(plan)
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                alert("Plan added successfully!");
+
+                document.getElementById("name").value = "";
+                document.getElementById("durationMonths").value = "";
+                document.getElementById("price").value = "";
+
+                loadPlans();
+            });
+    }
+
+    loadPlans();
+
+</script>
+
+</body>
+</html>
